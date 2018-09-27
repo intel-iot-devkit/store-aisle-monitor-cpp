@@ -1,5 +1,13 @@
 # Store Aisle Monitor
 
+
+| Details            |                 |
+|-----------------------|------------------|
+| Target OS:            |  Ubuntu\* 16.04 LTS     |
+| Programming Language  |  C++ |
+| Time to complete:     |  30 min      |
+
+
 ## What it Does
 
 This reference implementation takes a video input (webcam/loaded video), generates a visual heatmap / motion map, counts the number of people present and integrates the results. The application has the functionality of creating an output video and saving a snapshot at a particular instance by the user to the cloud.
