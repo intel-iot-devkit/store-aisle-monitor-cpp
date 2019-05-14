@@ -7,7 +7,7 @@
 | Time to complete      |  45 min      |
 
 
-This reference implementation is also [available in Python](https://github.com/intel-iot-devkit/reference-implementation-private/blob/master/store-aisle-monitor-python/README.md)
+This reference implementation is also [available in Python](https://github.com/intel-iot-devkit/store-aisle-monitor-python)
 
 ![heatmap_image](./images/heatmap.png)
 
