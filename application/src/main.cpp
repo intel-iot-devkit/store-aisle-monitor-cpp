@@ -32,6 +32,7 @@
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/video.hpp>
 #include <iostream>
+#include <fstream>
 #include <ctime>
 #include "opencv2/video/background_segm.hpp"
 #include <stdlib.h>
@@ -43,11 +44,14 @@
 #include <cpprest/filestream.h>
 #include <cpprest/containerstream.h>
 #include "samples_common.h"
+#include <nlohmann/json.hpp>
 
 using namespace std;
 using namespace cv;
 using namespace azure;
+using json = nlohmann::json;
 
+json jsonobj;
 string account_name, account_key;
 int flag_name, flag_key;
 
@@ -211,7 +215,7 @@ int main(int argc, char *argv[])
 	VideoCapture cap;
 	int count, fps, frame_count;
 	int frame_width, option, frame_height;
-	int thres, maxValue, key;
+	int thres, maxValue, key;	
 	maxValue = 2;
 	option = 0;
 	thres = 2;
@@ -219,36 +223,44 @@ int main(int argc, char *argv[])
 	frame_count = 1;
 	double alpha, beta;
 	alpha = 0.5;
-	if(argc <= 2)
+	String input;
+	std::string conf_file2 = "resources/config.json";
+	std::string conf_file = "../resources/config.json";
+	std::ifstream confFile(conf_file);
+	if (!confFile.is_open())
 	{
-		cout<<"Insufficient arguments"<<endl;
-		return -1;
+		std::ifstream confFile2(conf_file2);
+		if (!confFile2.is_open())
+		{
+		    cout << "Could not open config file" << endl;
+		    return 2;
+		}
+		confFile2>>jsonobj;
 	}
-	while ((option = getopt(argc, argv, ":i:n:k:")) != -1)
+	else
+		confFile>>jsonobj;
+
+	while ((option = getopt(argc, argv, ":n:k:")) != -1)
 	{
 	        switch (option)
 	        {
-	        	case 'i': if(strcmp(optarg, "cam") == 0 || strcmp(optarg, "CAM") == 0)
-	        		  {
-	        			cout << "Input from camera " << endl;
-	        			cap.open(0);
-	        		  }
-	        		  else
-	        		  {
-	        			cout << "Loading the video " << optarg << endl;
-	        			cap.open(optarg);
-	        		  }
-	        		  break;
-
-	        	case 'n': account_name = optarg;
+	         	case 'n': account_name = optarg;
 				  flag_name = 1;
-	        		  break;
+	        	  break;
 
 	        	case 'k': account_key = optarg;
 				  flag_key = 1;
 				  break;
 	        }
 	}
+	// parsing input source from config.json
+	auto obj = jsonobj["inputs"];
+	input = obj[0]["video"];
+
+	if (input.size() == 1 && *(input.c_str()) >= '0' && *(input.c_str()) <= '9')
+		cap.open(std::stoi(input));
+	else
+		cap.open(input);
 
 	if(!cap.isOpened())
 	{
@@ -260,29 +272,6 @@ int main(int argc, char *argv[])
 	frame_width = cap.get(CAP_PROP_FRAME_WIDTH);
 	frame_height = cap.get(CAP_PROP_FRAME_HEIGHT);
 	fps = cap.get(CAP_PROP_FPS);
-
-	// Initializing VideoWriter APIs
-	VideoWriter counter_video_object_file("counter_video.avi", VideoWriter::fourcc('M','J','P','G'), fps, Size(frame_width, frame_height));
-	VideoWriter integrated_video_object_file("integrated_video.avi", VideoWriter::fourcc('M','J','P','G'), fps, Size(frame_width, frame_height));
-	VideoWriter heatmap_video_object_file("heatmap_video.avi", VideoWriter::fourcc('M','J','P','G'), fps, Size(frame_width, frame_height));
-
-	if(!counter_video_object_file.isOpened())
-	{
-		cout << "Error opening counter_video.avi" << endl;
-		return -1;
-	}
-
-	if(!integrated_video_object_file.isOpened())
-	{
-		cout << "Error opening integrated_video.avi" << endl;
-		return -1;
-	}
-
-	if(!heatmap_video_object_file.isOpened())
-	{
-		cout << "Error opening heatmap_video.avi" << endl;
-		return -1;
-	}
 
 	// Initializing background segmentation pointer
 	Ptr<BackgroundSubtractorMOG2> background_segmentor_object_file = createBackgroundSubtractorMOG2();
@@ -316,20 +305,13 @@ int main(int argc, char *argv[])
 		applyColorMap(accum_image, result_overlay_video, COLORMAP_HOT);
 		addWeighted(frame, 0.5, result_overlay_video, 0.5, 0.0, result_overlay_video);
 
-		// Heatmap video generation
-		heatmap_video_object_file.write(result_overlay_video);
-
 		count = setup(frame);
-
-		// Counter video generation
-		counter_video_object_file.write(frame);
 
 		// Integrated video generation
 		addWeighted(frame, 0.45, result_overlay_video, 0.55, 0.0, final_img);
-		integrated_video_object_file.write(final_img);
 
 		imshow("store-aisle-monitor", final_img);
-		if(frame_count == 5*fps)
+		if(frame_count%(5*fps) == 0)
 		{
 			time(result_overlay_video, 1, count);
 			time(frame, 2, count);
@@ -338,7 +320,7 @@ int main(int argc, char *argv[])
 		}
 		frame_count++;
 
-		key = (waitKey(20) & 0xFF);
+		key = (waitKey(1) & 0xFF);
 		if(key == 'q')
 			break;
 
