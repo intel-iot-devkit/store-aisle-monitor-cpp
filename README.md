@@ -27,7 +27,7 @@ This reference implementation counts the number of people present in an image an
      uname -a
      ```
 
-- Intel® Distribution of OpenVINO™ toolkit 2019 R2 Release
+- Intel® Distribution of OpenVINO™ toolkit 2019 R3 Release
 
 ## How it Works
 - The application uses a video source, such as a camera or a video file, to grab the frames. The [OpenCV functions](https://docs.opencv.org/3.0-beta/modules/videoio/doc/reading_and_writing_video.html) are used to calculate frame width, frame height and frames per second (fps) of the video source. The application counts the number of people and generates motion heatmap.
