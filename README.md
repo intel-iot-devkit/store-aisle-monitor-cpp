@@ -2,7 +2,7 @@
 
 | Details               |                  |
 |-----------------------|------------------|
-| Target OS             |  Ubuntu\* 16.04 LTS     |
+| Target OS             |  Ubuntu\* 18.04 LTS     |
 | Programming Language  |  C++ |
 | Time to complete      |  45 min      |
 
@@ -21,13 +21,13 @@ This reference implementation counts the number of people present in an image an
 
 ### Software
 
-- [Ubuntu\* 16.04 LTS](http://releases.ubuntu.com/16.04/)<br>
+- [Ubuntu\* 18.04 LTS](http://releases.ubuntu.com/18.04/)<br>
   **Note**: We recommend using a 4.14+ Linux* kernel with this software. Run the following command to determine the kernel version:<br>
      ```
      uname -a
      ```
 
-- Intel® Distribution of OpenVINO™ toolkit 2019 R3 Release
+- Intel® Distribution of OpenVINO™ toolkit 2020 R3 Release
 
 ## How it Works
 - The application uses a video source, such as a camera or a video file, to grab the frames. The [OpenCV functions](https://docs.opencv.org/3.0-beta/modules/videoio/doc/reading_and_writing_video.html) are used to calculate frame width, frame height and frames per second (fps) of the video source. The application counts the number of people and generates motion heatmap.

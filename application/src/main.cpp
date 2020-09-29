@@ -277,8 +277,11 @@ int main(int argc, char *argv[])
 	Ptr<BackgroundSubtractorMOG2> background_segmentor_object_file = createBackgroundSubtractorMOG2();
 
 	Mat gray, accum_image, first_frame, frame;
+         
 	Mat result_overlay_video, final_img;
 	cap.read(first_frame);
+	accum_image = Mat::zeros(Size(first_frame.cols,first_frame.rows),CV_8UC1);
+
 
 	while(cap.isOpened())
 	{
